@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: reviewbot
+  threads:
+    virtual:
+      enabled: true          # threads virtuelles (exigé par le sujet)
+  datasource:
+    url: jdbc:hsqldb:file:./data/reviewbot;shutdown=true
+    username: SA
+    password: ""
+  sql:
+    init:
+      mode: always           # exécute schema.sql au démarrage
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

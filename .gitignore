@@ -1,0 +1,13 @@
+# Java / Maven
+target/
+*.class
+# Données locales (base HSQLDB) et modèles LLM (trop gros pour Git)
+data/
+models/*.gguf
+# Front
+frontend/node_modules/
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
