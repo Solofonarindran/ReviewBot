@@ -49,4 +49,18 @@ public class JdbcExecutor {
     public  <T> Optional<T> queryOne(String sql, Binder binder, RowMapper<T> mapper) throws Exception {
         return query(sql, binder,mapper).stream().findFirst();
     }
+
+    public int update(String  sql, Binder binder) throws Exception {
+        var connection = DataSourceUtils.getConnection(dataSource);
+        try(var statement = connection.prepareStatement(sql)) {
+            binder.bind(statement);
+            return statement.executeUpdate();
+        }catch (SQLException e) {
+            throw new Exception(e.getMessage());
+        }finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
+        }
+    }
+
 }
+
