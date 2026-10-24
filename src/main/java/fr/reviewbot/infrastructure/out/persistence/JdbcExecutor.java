@@ -1,6 +1,7 @@
 package fr.reviewbot.infrastructure.out.persistence;
 
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,14 +12,21 @@ import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
 
+/**
+ * Exécute du SQL écrit à la main avec JDBC, via le DataSource.
+ * Les connexions passent par DataSourceUtils : elles participent aux transactions Spring (@Transactional).
+ */
+@Component
 public class JdbcExecutor {
     private final  DataSource dataSource;
 
+    /** Renseigne les paramètres (?) d'une requête. */
     @FunctionalInterface
     public interface Binder {
         void bind(PreparedStatement statement)throws SQLException;
     }
 
+    /** Transforme la ligne courante d'un résultat en objet. */
     @FunctionalInterface
     public interface RowMapper<T> {
         T map(ResultSet resultSet) throws SQLException;
@@ -51,7 +59,10 @@ public class JdbcExecutor {
         return query(sql, binder,mapper).stream().findFirst();
     }
 
+    /** Exécute un INSERT, UPDATE ou DELETE et renvoie le nombre de lignes touchées. */
+
     public int update(String  sql, Binder binder) throws Exception {
+        
         var connection = DataSourceUtils.getConnection(dataSource);
         try(var statement = connection.prepareStatement(sql)) {
             binder.bind(statement);
@@ -63,8 +74,10 @@ public class JdbcExecutor {
         }
     }
 
+    /** Exécute un INSERT et renvoie l'identifiant généré. */
     public long insert(String  sql, Binder binder) throws Exception {
         var connection = DataSourceUtils.getConnection(dataSource);
+
         try(var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS )) {
             binder.bind(statement);
             statement.executeUpdate();
