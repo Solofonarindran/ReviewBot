@@ -5,6 +5,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +60,24 @@ public class JdbcExecutor {
             throw new Exception(e.getMessage());
         }finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
+        }
+    }
+
+    public long insert(String  sql, Binder binder) throws Exception {
+        var connection = DataSourceUtils.getConnection(dataSource);
+        try(var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS )) {
+            binder.bind(statement);
+            statement.executeUpdate();
+            try (var keys = statement.getGeneratedKeys()) {
+                if(keys.next()) {
+                    return keys.getLong(1);
+                }
+                throw new Exception(String.format("Insertion of %s failed", sql));
+            }catch (SQLException e) {
+                throw new Exception(e.getMessage());
+            }finally {
+                DataSourceUtils.releaseConnection(connection, dataSource);
+            }
         }
     }
 
