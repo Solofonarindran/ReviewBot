@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.sql.DataSource;
 
 public class JdbcExecutor {
@@ -43,5 +44,9 @@ public class JdbcExecutor {
         }finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
+    }
+
+    public  <T> Optional<T> queryOne(String sql, Binder binder, RowMapper<T> mapper) throws Exception {
+        return query(sql, binder,mapper).stream().findFirst();
     }
 }
