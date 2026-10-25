@@ -49,7 +49,7 @@ public class JdbcExecutor {
             }
 
         } catch (SQLException e) {
-            throw new Exception(e.getMessage());
+            throw new SQLException(e.getMessage());
         }finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
@@ -62,13 +62,12 @@ public class JdbcExecutor {
     /** Exécute un INSERT, UPDATE ou DELETE et renvoie le nombre de lignes touchées. */
 
     public int update(String  sql, Binder binder) throws Exception {
-        
         var connection = DataSourceUtils.getConnection(dataSource);
         try(var statement = connection.prepareStatement(sql)) {
             binder.bind(statement);
             return statement.executeUpdate();
         }catch (SQLException e) {
-            throw new Exception(e.getMessage());
+            throw new SQLException(String.format("Update of %s failed", sql));
         }finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
@@ -85,9 +84,9 @@ public class JdbcExecutor {
                 if(keys.next()) {
                     return keys.getLong(1);
                 }
-                throw new Exception(String.format("Insertion of %s failed", sql));
+                throw new SQLException(String.format("Insertion of %s failed", sql));
             }catch (SQLException e) {
-                throw new Exception(e.getMessage());
+                throw new SQLException(String.format("Insertion of %s failed", sql));
             }finally {
                 DataSourceUtils.releaseConnection(connection, dataSource);
             }
