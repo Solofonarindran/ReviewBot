@@ -3,6 +3,12 @@ package fr.reviewbot.domain.model;
 import java.time.Instant;
 import java.util.Objects;
 
+enum Platform {
+    GITHUB,
+    GITLAB,
+    BITBUCKET
+}
+
 public record Repository(Long id,
                          Platform platform,
                          String fullName,
