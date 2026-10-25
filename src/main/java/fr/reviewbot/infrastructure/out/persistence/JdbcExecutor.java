@@ -34,6 +34,7 @@ public class JdbcExecutor {
 
     public JdbcExecutor(DataSource dataSource) {
         this.dataSource = dataSource;
+        super();
     }
 
     private <T> List<T> query(String sql, Binder binder,  RowMapper<T> rowMapper) throws Exception {
