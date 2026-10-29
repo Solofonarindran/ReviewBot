@@ -21,6 +21,22 @@ public class JdbcRepositoryStore implements RepositoryStore {
 
     public Repository save(Repository repository) {
         Objects.requireNonNull(repository);
-        var now = 
+        var now = Sql.toTimestamp(clock.instant());
+        if(repository.id() == null) {
+            var id = jdbc.insert("INSERT INTO repository (plateform, full_name, clone_url, api_token_encrypted," +
+                    "webhook_secret_encrypted, enable, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?)",
+                    ps-> {
+                        ps.setString(1, repository.platform().name());
+                        ps.setString(2, repository.fullName());
+                        ps.setString(3, repository.cloneUrl());
+                        ps.setString(4, repository.apiTokenCrypted());
+                        ps.setString(5, repository.webhookSecretEncrypted());
+                        ps.setBoolean(6,repository.enabled());
+                        ps.setTimestamp(7,now);
+                        ps.setTimestamp(8,now);
+
+                    });
+            return findById(id).orElseThrow();
+        }
     }
 }
