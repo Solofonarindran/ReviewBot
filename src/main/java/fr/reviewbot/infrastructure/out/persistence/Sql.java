@@ -18,11 +18,12 @@ public record Sql() {
         return timestamp.toInstant();
     }
 
-    static  Instant getTimestamp(ResultSet resultset, String column) throws SQLException {
+    static  Instant getInstant(ResultSet resultset, String column) throws SQLException {
         Objects.requireNonNull(resultset);
         Objects.requireNonNull(column);
         return  toInstant(resultset.getTimestamp(column));
     }
+
     static <E extends  Enum<E>> E getEnum(ResultSet resultset, String column, Class<E> enumClass) throws SQLException {
         Objects.requireNonNull(resultset);
         Objects.requireNonNull(column);
