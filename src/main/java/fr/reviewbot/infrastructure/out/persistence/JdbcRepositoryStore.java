@@ -66,8 +66,6 @@ public class JdbcRepositoryStore implements RepositoryStore {
         }
 
 
-    }
-
     @Override
     public Optional<Repository> findById(long id) {
         try {
