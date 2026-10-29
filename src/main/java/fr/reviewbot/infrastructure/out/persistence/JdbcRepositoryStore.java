@@ -1,8 +1,10 @@
 package fr.reviewbot.infrastructure.out.persistence;
 
 import fr.reviewbot.application.port.out.RepositoryStore;
+import fr.reviewbot.domain.model.ModalEnum;
 import fr.reviewbot.domain.model.Repository;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.util.Objects;
@@ -49,7 +51,26 @@ public class JdbcRepositoryStore implements RepositoryStore {
 
     @Override
     public Optional<Repository> findById(long id) {
-        return jdbc.queryOne("SELECT" + COLUMNS + "FROM repository where id = ?",
-                ps -> ps.setLong(1,id),JdbcRepositoryStore::map);
+        try {
+            return jdbc.queryOne("SELECT" + COLUMNS + "FROM repository where id = ?",
+                    ps -> ps.setLong(1,id),JdbcRepositoryStore::map);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
+
+    private static Repository map(ResultSet resultSet) throws  SQLException{
+        return new Repository(
+                resultSet.getLong("id"),
+                Sql.getEnum(resultSet, "platform", ModalEnum.Platform.class),
+                resultSet.getString("full_name"),
+                resultSet.getString("clone_url"),
+                resultSet.getString("api_token_encrypted"),
+                resultSet.getString("webhook_secret_encrypted"),
+                resultSet.getBoolean("enabled"),
+                Sql.getInstant(resultSet, "created_at"),
+                Sql.getInstant(resultSet, "updated_at"));
+    }
+
 }
