@@ -26,27 +26,46 @@ public class JdbcRepositoryStore implements RepositoryStore {
     public Repository save(Repository repository) {
         Objects.requireNonNull(repository);
         var now = Sql.toTimestamp(clock.instant());
-        if(repository.id() == null) {
+
             try {
-                var id = jdbc.insert("INSERT INTO repository (plateform, full_name, clone_url, api_token_encrypted," +
-                                "webhook_secret_encrypted, enable, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?)",
-                        ps-> {
+                if(repository.id() == null) {
+                    var id = jdbc.insert("INSERT INTO repository (plateform, full_name, clone_url, api_token_encrypted," +
+                                    "webhook_secret_encrypted, enable, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?)",
+                            ps -> {
+                                ps.setString(1, repository.platform().name());
+                                ps.setString(2, repository.fullName());
+                                ps.setString(3, repository.cloneUrl());
+                                ps.setString(4, repository.apiTokenCrypted());
+                                ps.setString(5, repository.webhookSecretEncrypted());
+                                ps.setBoolean(6, repository.enabled());
+                                ps.setTimestamp(7, now);
+                                ps.setTimestamp(8, now);
+
+                            });
+                    return findById(id).orElseThrow();
+                }
+                var rows = jdbc.update(
+                        "UPDATE repository SET platform=?, full_name=?, clone_url=?, api_token_encrypted=?, "
+                                + "webhook_secret_encrypted=?, enabled=?, updated_at=? WHERE id=?",
+                        ps -> {
                             ps.setString(1, repository.platform().name());
                             ps.setString(2, repository.fullName());
                             ps.setString(3, repository.cloneUrl());
                             ps.setString(4, repository.apiTokenCrypted());
                             ps.setString(5, repository.webhookSecretEncrypted());
-                            ps.setBoolean(6,repository.enabled());
-                            ps.setTimestamp(7,now);
-                            ps.setTimestamp(8,now);
-
+                            ps.setBoolean(6, repository.enabled());
+                            ps.setTimestamp(7, now);
+                            ps.setLong(8, repository.id());
                         });
-                return findById(id).orElseThrow();
+                if(rows == 0)  throw new RuntimeException("Dépôt not found : " + repository.id(), null);
+                return findById(repository.id()).orElseThrow();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
         }
+
+
     }
 
     @Override
