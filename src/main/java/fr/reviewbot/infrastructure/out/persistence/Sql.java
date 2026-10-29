@@ -23,4 +23,15 @@ public record Sql() {
         Objects.requireNonNull(column);
         return  toInstant(resultset.getTimestamp(column));
     }
+    static <E extends  Enum<E>> E getEnum(ResultSet resultset, String column, Class<E> enumClass) throws SQLException {
+        Objects.requireNonNull(resultset);
+        Objects.requireNonNull(column);
+        Objects.requireNonNull(enumClass);
+
+        var value = resultset.getString(column);
+        return Enum.valueOf(enumClass, value);
+    }
+    static  String name(Enum<?> value) {
+        return value.name();
+    }
 }
