@@ -37,20 +37,21 @@ public class JdbcExecutor {
         super();
     }
 
-    private <T> List<T> query(String sql, Binder binder,  RowMapper<T> rowMapper) throws Exception {
-        var connection = DataSourceUtils.getConnection(dataSource);
-        try(var statement = connection.prepareStatement(sql)) {
-            binder.bind(statement);
-            try(var resultSet = statement.executeQuery()) {
-                List<T> results = new ArrayList<>();
-                while (resultSet.next()) {
-                    results.add(rowMapper.map(resultSet));
-                }
-                return  results;
-            }
 
-        } catch (SQLException e) {
-            throw new SQLException(e.getMessage());
+    public <T> List<T> query(String sql, Binder binder,  RowMapper<T> rowMapper) throws SQLException{
+        var connection = DataSourceUtils.getConnection(dataSource);
+        try{
+            try(var statement = connection.prepareStatement(sql)) {
+                binder.bind(statement);
+                try(var resultSet = statement.executeQuery()) {
+                    List<T> results = new ArrayList<>();
+                    while (resultSet.next()) {
+                        results.add(rowMapper.map(resultSet));
+                    }
+                    return  results;
+                }
+
+            }
         }finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
