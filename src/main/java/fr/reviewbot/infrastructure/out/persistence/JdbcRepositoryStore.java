@@ -100,7 +100,7 @@ public class JdbcRepositoryStore implements RepositoryStore {
                 }, JdbcRepositoryStore::map);
     }
     @Override
-    public List<Repository> findAll() {
+    public List<Repository> findAll() throws Exception{
         return jdbc.query("SELECT " + COLUMNS + " FROM repository ORDER BY full_name, id",
                 ps -> { }, JdbcRepositoryStore::map);
     }
