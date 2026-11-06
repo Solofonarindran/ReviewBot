@@ -90,4 +90,11 @@ public class JdbcRepositoryStore implements RepositoryStore {
                 Sql.getInstant(resultSet, "updated_at"));
     }
 
+    public Optional<Repository> findByPlatformAndFullName(ModalEnum.Platform platform, String fullName) throws Exception{
+        return jdbc.queryOne("SELECT " + COLUMNS + " FROM repository WHERE platform = ? AND full_name = ?",
+                ps -> {
+                    ps.setString(1, platform.name());
+                    ps.setString(2, fullName);
+                }, JdbcRepositoryStore::map);
+    }
 }
