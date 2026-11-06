@@ -7,6 +7,7 @@ import fr.reviewbot.domain.model.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -90,11 +91,17 @@ public class JdbcRepositoryStore implements RepositoryStore {
                 Sql.getInstant(resultSet, "updated_at"));
     }
 
+    @Override
     public Optional<Repository> findByPlatformAndFullName(ModalEnum.Platform platform, String fullName) throws Exception{
         return jdbc.queryOne("SELECT " + COLUMNS + " FROM repository WHERE platform = ? AND full_name = ?",
                 ps -> {
                     ps.setString(1, platform.name());
                     ps.setString(2, fullName);
                 }, JdbcRepositoryStore::map);
+    }
+    @Override
+    public List<Repository> findAll() {
+        return jdbc.query("SELECT " + COLUMNS + " FROM repository ORDER BY full_name, id",
+                ps -> { }, JdbcRepositoryStore::map);
     }
 }
