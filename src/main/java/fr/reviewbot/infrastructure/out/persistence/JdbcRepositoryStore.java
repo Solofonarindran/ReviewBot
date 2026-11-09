@@ -92,16 +92,35 @@ public class JdbcRepositoryStore implements RepositoryStore {
     }
 
     @Override
-    public Optional<Repository> findByPlatformAndFullName(ModalEnum.Platform platform, String fullName) throws Exception{
-        return jdbc.queryOne("SELECT " + COLUMNS + " FROM repository WHERE platform = ? AND full_name = ?",
-                ps -> {
-                    ps.setString(1, platform.name());
-                    ps.setString(2, fullName);
-                }, JdbcRepositoryStore::map);
+    public Optional<Repository> findByPlatformAndFullName(ModalEnum.Platform platform, String fullName) {
+        try{
+            return jdbc.queryOne("SELECT " + COLUMNS + " FROM repository WHERE platform = ? AND full_name = ?",
+                    ps -> {
+                        ps.setString(1, platform.name());
+                        ps.setString(2, fullName);
+                    }, JdbcRepositoryStore::map);
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+
     }
     @Override
-    public List<Repository> findAll() throws Exception{
-        return jdbc.query("SELECT " + COLUMNS + " FROM repository ORDER BY full_name, id",
-                ps -> { }, JdbcRepositoryStore::map);
+    public List<Repository> findAll() {
+        try {
+            return jdbc.query("SELECT " + COLUMNS + " FROM repository ORDER BY full_name, id",
+                    ps -> { }, JdbcRepositoryStore::map);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public void deleteById(long id) {
+        try{
+            jdbc.update("DELETE FROM repository WHERE id = ?", ps -> ps.setLong(1, id));
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }
