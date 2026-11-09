@@ -1,9 +1,13 @@
 package fr.reviewbot.infrastructure.out.persistence;
 
 import fr.reviewbot.application.port.out.ReviewStore;
+import fr.reviewbot.domain.model.ModalEnum;
 import fr.reviewbot.domain.model.Review;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Clock;
+import java.util.Optional;
 
 public class JdbcReviewStore implements ReviewStore {
     private static final String COLUMNS = "id, repository_id, pr_number, pr_title, pr_author, source_branch, "
@@ -89,4 +93,35 @@ public class JdbcReviewStore implements ReviewStore {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public Optional<Review> findById(long id) {
+        return jdbc.queryOne("SELECT " + COLUMNS + " FROM review WHERE id = ?",
+                ps -> ps.setLong(1, id), JdbcReviewStore::map);
+    }
+
+}
+
+private static Review map(ResultSet rs) throws SQLException {
+    return new Review(
+            rs.getLong("id"),
+            rs.getLong("repository_id"),
+            rs.getString("pr_number"),
+            rs.getString("pr_title"),
+            rs.getString("pr_author"),
+            rs.getString("source_branch"),
+            rs.getString("target_branch"),
+            rs.getString("head_commit_sha"),
+            Sql.getEnum(rs, "status", ModalEnum.ReviewStatus.class),
+            Sql.getEnum(rs, "verdict", ModalEnum.Verdict.class),
+            rs.getInt("blocking_count"),
+            rs.getInt("major_count"),
+            rs.getInt("minor_count"),
+            rs.getBigDecimal("coverage_changed_lines"),
+            rs.getString("error_message"),
+            rs.getString("config_snapshot"),
+            rs.getString("global_comment_ref"),
+            Sql.getInstant(rs, "queued_at"),
+            Sql.getInstant(rs, "started_at"),
+            Sql.getInstant(rs, "finished_at"));
 }
