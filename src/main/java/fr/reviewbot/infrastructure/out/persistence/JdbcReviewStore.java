@@ -129,6 +129,16 @@ public class JdbcReviewStore implements ReviewStore {
         }
 
     }
+
+    @Override
+    public long count() {
+        try {
+            return jdbc.queryOne("SELECT COUNT(*) FROM review", ps -> { }, rs -> rs.getLong(1)).orElse(0L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     private static Review map(ResultSet rs) throws SQLException {
         return new Review(
                 rs.getLong("id"),
