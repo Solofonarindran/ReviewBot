@@ -7,6 +7,7 @@ import fr.reviewbot.domain.model.Review;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
+import java.util.List;
 import java.util.Optional;
 
 public class JdbcReviewStore implements ReviewStore {
@@ -96,8 +97,23 @@ public class JdbcReviewStore implements ReviewStore {
 
     @Override
     public Optional<Review> findById(long id) {
-        return jdbc.queryOne("SELECT " + COLUMNS + " FROM review WHERE id = ?",
-                ps -> ps.setLong(1, id), JdbcReviewStore::map);
+        try {
+            return jdbc.queryOne("SELECT " + COLUMNS + " FROM review WHERE id = ?",
+                    ps -> ps.setLong(1, id), JdbcReviewStore::map);
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public List<Review> findByRepositoryId(long repositoryId) {
+        try {
+            return jdbc.query("SELECT " + COLUMNS + " FROM review WHERE repository_id = ?" + ORDER_NEWEST_FIRST,
+                    ps -> ps.setLong(1, repositoryId), JdbcReviewStore::map);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static Review map(ResultSet rs) throws SQLException {
