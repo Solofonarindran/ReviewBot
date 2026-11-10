@@ -116,6 +116,19 @@ public class JdbcReviewStore implements ReviewStore {
         }
     }
 
+    @Override
+    public List<Review> findPage(int limit, int offset) {
+        try {
+            return jdbc.query("SELECT " + COLUMNS + " FROM review" + ORDER_NEWEST_FIRST + " LIMIT ? OFFSET ?",
+                    ps -> {
+                        ps.setInt(1, limit);
+                        ps.setInt(2, offset);
+                    }, JdbcReviewStore::map);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
     private static Review map(ResultSet rs) throws SQLException {
         return new Review(
                 rs.getLong("id"),
