@@ -100,28 +100,30 @@ public class JdbcReviewStore implements ReviewStore {
                 ps -> ps.setLong(1, id), JdbcReviewStore::map);
     }
 
+    private static Review map(ResultSet rs) throws SQLException {
+        return new Review(
+                rs.getLong("id"),
+                rs.getLong("repository_id"),
+                rs.getString("pr_number"),
+                rs.getString("pr_title"),
+                rs.getString("pr_author"),
+                rs.getString("source_branch"),
+                rs.getString("target_branch"),
+                rs.getString("head_commit_sha"),
+                Sql.getEnum(rs, "status", ModalEnum.ReviewStatus.class),
+                Sql.getEnum(rs, "verdict", ModalEnum.Verdict.class),
+                rs.getInt("blocking_count"),
+                rs.getInt("major_count"),
+                rs.getInt("minor_count"),
+                rs.getBigDecimal("coverage_changed_lines"),
+                rs.getString("error_message"),
+                rs.getString("config_snapshot"),
+                rs.getString("global_comment_ref"),
+                Sql.getInstant(rs, "queued_at"),
+                Sql.getInstant(rs, "started_at"),
+                Sql.getInstant(rs, "finished_at"));
+    }
+
 }
 
-private static Review map(ResultSet rs) throws SQLException {
-    return new Review(
-            rs.getLong("id"),
-            rs.getLong("repository_id"),
-            rs.getString("pr_number"),
-            rs.getString("pr_title"),
-            rs.getString("pr_author"),
-            rs.getString("source_branch"),
-            rs.getString("target_branch"),
-            rs.getString("head_commit_sha"),
-            Sql.getEnum(rs, "status", ModalEnum.ReviewStatus.class),
-            Sql.getEnum(rs, "verdict", ModalEnum.Verdict.class),
-            rs.getInt("blocking_count"),
-            rs.getInt("major_count"),
-            rs.getInt("minor_count"),
-            rs.getBigDecimal("coverage_changed_lines"),
-            rs.getString("error_message"),
-            rs.getString("config_snapshot"),
-            rs.getString("global_comment_ref"),
-            Sql.getInstant(rs, "queued_at"),
-            Sql.getInstant(rs, "started_at"),
-            Sql.getInstant(rs, "finished_at"));
-}
+
