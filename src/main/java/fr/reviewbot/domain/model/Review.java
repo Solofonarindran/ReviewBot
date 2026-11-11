@@ -50,15 +50,7 @@ public record Review(
         Instant startedAt,
         Instant finishedAt
 ) {
-    public Review {
-        Objects.requireNonNull(prNumber);
-        Objects.requireNonNull(prTitle);
-        Objects.requireNonNull(prAuthor);
-        Objects.requireNonNull(sourceBranch);
-        Objects.requireNonNull(targetBranch);
-        Objects.requireNonNull(headCommitSha);
-        Objects.requireNonNull(status);
-    }
+
 
     /** Crée une revue neuve, en attente, sans résultat. */
 
