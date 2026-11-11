@@ -3,6 +3,7 @@ package fr.reviewbot.infrastructure.out.persistence;
 import fr.reviewbot.application.port.out.RepositoryStore;
 import fr.reviewbot.domain.model.ModalEnum;
 import fr.reviewbot.domain.model.Repository;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Component
 public class JdbcRepositoryStore implements RepositoryStore {
 
     private  static final  String COLUMNS = "id, platform, full_name, clone_url, api_token_encrypted, "
@@ -25,7 +27,7 @@ public class JdbcRepositoryStore implements RepositoryStore {
     }
 
     public Repository save(Repository repository) {
-        Objects.requireNonNull(repository);
+
         var now = Sql.toTimestamp(clock.instant());
 
             try {
@@ -36,7 +38,7 @@ public class JdbcRepositoryStore implements RepositoryStore {
                                 ps.setString(1, repository.platform().name());
                                 ps.setString(2, repository.fullName());
                                 ps.setString(3, repository.cloneUrl());
-                                ps.setString(4, repository.apiTokenCrypted());
+                                ps.setString(4, repository.apiTokenEncrypted());
                                 ps.setString(5, repository.webhookSecretEncrypted());
                                 ps.setBoolean(6, repository.enabled());
                                 ps.setTimestamp(7, now);
@@ -52,7 +54,7 @@ public class JdbcRepositoryStore implements RepositoryStore {
                             ps.setString(1, repository.platform().name());
                             ps.setString(2, repository.fullName());
                             ps.setString(3, repository.cloneUrl());
-                            ps.setString(4, repository.apiTokenCrypted());
+                            ps.setString(4, repository.apiTokenEncrypted());
                             ps.setString(5, repository.webhookSecretEncrypted());
                             ps.setBoolean(6, repository.enabled());
                             ps.setTimestamp(7, now);
