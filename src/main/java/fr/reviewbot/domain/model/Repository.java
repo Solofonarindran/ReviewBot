@@ -8,20 +8,12 @@ public record Repository(Long id,
                          ModalEnum.Platform platform,
                          String fullName,
                          String cloneUrl,
-                         String apiTokenCrypted,
+                         String apiTokenEncrypted,
                          String webhookSecretEncrypted,
                          boolean enabled,
                          Instant created,
                          Instant updatedAt) {
 
-    public Repository {
-        Objects.requireNonNull(platform, "platform non null");
-        Objects.requireNonNull(fullName, "fullName non null");
-        Objects.requireNonNull(apiTokenCrypted, "apiTokenCrypted non null");
-        Objects.requireNonNull(apiTokenCrypted, "webhookSecretEncrypted non null");
-//        Objects.requireNonNull(created);
-//        Objects.requireNonNull(updatedAt);
-    }
 
     public Repository(ModalEnum.Platform plateform, String fullName, String cloneUrl, String apiTokenCrypted,
                       String webhookSecretEncrypted) {
@@ -32,7 +24,7 @@ public record Repository(Long id,
                                     String apiTokenEncrypted, String webhookSecretEncrypted) {
         return new Repository(null, platform, fullName, cloneUrl,
                 apiTokenEncrypted, webhookSecretEncrypted, true, null, null);
-    
+
     }
 
 }
