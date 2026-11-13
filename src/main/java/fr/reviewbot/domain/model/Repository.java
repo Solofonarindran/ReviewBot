@@ -13,7 +13,15 @@ public record Repository(Long id,
                          boolean enabled,
                          Instant created,
                          Instant updatedAt) {
-
+    public Repository {
+        Objects.requireNonNull(platform, "platform");
+        if (fullName == null || fullName.isBlank()) {
+            throw new IllegalArgumentException("fullName est obligatoire");
+        }
+        if (cloneUrl == null || cloneUrl.isBlank()) {
+            throw new IllegalArgumentException("cloneUrl est obligatoire");
+        }
+    }
 
     public Repository(ModalEnum.Platform plateform, String fullName, String cloneUrl, String apiTokenCrypted,
                       String webhookSecretEncrypted) {
