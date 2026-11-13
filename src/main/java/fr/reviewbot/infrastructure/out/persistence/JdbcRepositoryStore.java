@@ -16,7 +16,7 @@ import java.util.Optional;
 public class JdbcRepositoryStore implements RepositoryStore {
 
     private  static final  String COLUMNS = "id, platform, full_name, clone_url, api_token_encrypted, "
-             + "webhook_secret_encrypted, enable, created_at, updated_at";
+             + "webhook_secret_encrypted, enabled, created_at, updated_at";
     private final JdbcExecutor jdbc;
     private final Clock clock;
 
@@ -32,8 +32,8 @@ public class JdbcRepositoryStore implements RepositoryStore {
 
             try {
                 if(repository.id() == null) {
-                    var id = jdbc.insert("INSERT INTO repository (plateform, full_name, clone_url, api_token_encrypted," +
-                                    "webhook_secret_encrypted, enable, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?)",
+                    var id = jdbc.insert("INSERT INTO repository (platform, full_name, clone_url, api_token_encrypted," +
+                                    "webhook_secret_encrypted, enabled, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?)",
                             ps -> {
                                 ps.setString(1, repository.platform().name());
                                 ps.setString(2, repository.fullName());
@@ -72,7 +72,7 @@ public class JdbcRepositoryStore implements RepositoryStore {
     @Override
     public Optional<Repository> findById(long id) {
         try {
-            return jdbc.queryOne("SELECT" + COLUMNS + "FROM repository where id = ?",
+            return jdbc.queryOne("SELECT " + COLUMNS + " FROM repository where id = ?",
                     ps -> ps.setLong(1,id),JdbcRepositoryStore::map);
         } catch (Exception e) {
             throw new RuntimeException(e);
