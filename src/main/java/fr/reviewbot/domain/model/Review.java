@@ -57,7 +57,7 @@ public record Review(
     public static  Review queued(long repositoryId, String prNumber, String prTitle, String prAuthor,
                                  String sourceBranch, String targetBranch, String headCommitSha) {
         return new Review(null, repositoryId, prNumber, prTitle, prAuthor, sourceBranch,
-                         targetBranch,headCommitSha, ModalEnum.ReviewStatus.QUEUED, null,0,0,0,
+                         targetBranch,headCommitSha, ModalEnum.ReviewStatus.QUEUED, ModalEnum.Verdict.PENDING,0,0,0,
                 null, null,null,null,null  ,null,null);
     }
 }
