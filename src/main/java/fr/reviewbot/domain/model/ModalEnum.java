@@ -66,6 +66,7 @@ public class ModalEnum {
     }
 
     public static enum Verdict{
+        PENDING, // en attente
         APPROVED,
         TO_FIX,
         BLOCKING
