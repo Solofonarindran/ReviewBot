@@ -22,7 +22,7 @@ public class EnumsTest {
 
     @Test
     void verdictValues() {
-        assertEquals(List.of("APPROVED", "TO_FIX", "BLOCKING"), names(ModalEnum.Verdict.values()));
+        assertEquals(List.of("PENDING","APPROVED", "TO_FIX", "BLOCKING"), names(ModalEnum.Verdict.values()));
     }
 
     @Test
