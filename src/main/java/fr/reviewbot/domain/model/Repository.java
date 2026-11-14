@@ -31,7 +31,7 @@ public record Repository(Long id,
 
     public Repository(ModalEnum.Platform plateform, String fullName, String cloneUrl, String apiTokenCrypted,
                       String webhookSecretEncrypted) {
-        this(Unset.ID,plateform, fullName, cloneUrl, apiTokenCrypted, webhookSecretEncrypted, true, Instant.now(), Instant.now());
+        this(Unset.ID,plateform, fullName, cloneUrl, apiTokenCrypted, webhookSecretEncrypted, true, Unset.INSTANT, Unset.INSTANT);
     }
     /** Crée un dépôt neuf, actif, pas encore enregistré. */
     public static Repository create(ModalEnum.Platform platform, String fullName, String cloneUrl,
