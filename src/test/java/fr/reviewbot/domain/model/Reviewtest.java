@@ -11,7 +11,7 @@ public class Reviewtest {
         assertNull(review.id());
         assertEquals(7L, review.repositoryId());
         assertEquals(ModalEnum.ReviewStatus.QUEUED, review.status());
-        assertNull(review.verdict());
+        assertEquals(ModalEnum.Verdict.PENDING, review.verdict());
         assertEquals(0, review.blockingCount());
         assertEquals(0, review.majorCount());
         assertEquals(0, review.minorCount());
