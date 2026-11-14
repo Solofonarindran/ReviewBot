@@ -50,7 +50,7 @@ class JdbcReviewStoreTest {
         assertEquals("214", saved.prNumber());
         assertEquals("Titre 214", saved.prTitle());
         assertEquals(ModalEnum.ReviewStatus.QUEUED, saved.status());
-        assertNull(saved.verdict());
+        assertEquals(ModalEnum.Verdict.PENDING, saved.verdict());
         assertNull(saved.coverageChangedLines());
         assertNotNull(saved.queuedAt());
         assertNull(saved.startedAt());
@@ -87,7 +87,7 @@ class JdbcReviewStoreTest {
         String longError = "erreur ".repeat(2_000);
         Review failed = new Review(saved.id(), saved.repositoryId(), saved.prNumber(), saved.prTitle(),
                 saved.prAuthor(), saved.sourceBranch(), saved.targetBranch(), saved.headCommitSha(),
-                ModalEnum.ReviewStatus.FAILED, null, 0, 0, 0, null, longError, null, null, saved.queuedAt(), null, null);
+                ModalEnum.ReviewStatus.FAILED, ModalEnum.Verdict.PENDING, 0, 0, 0, null, longError, null, null, saved.queuedAt(), null, null);
 
         Review updated = reviews.save(failed);
 
@@ -97,7 +97,7 @@ class JdbcReviewStoreTest {
     @Test
     void updateOfUnknownReviewFails() {
         Review ghost = new Review(999_999L, repositoryId, "1", "t", "a", "s", "t", "sha",
-                ModalEnum.ReviewStatus.QUEUED, null, 0, 0, 0, null, null, null, null, null, null, null);
+                ModalEnum.ReviewStatus.QUEUED, ModalEnum.Verdict.PENDING, 0, 0, 0, null, null, null, null, null, null, null);
 
         assertThrows(RuntimeException.class, () -> reviews.save(ghost));
     }
