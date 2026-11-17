@@ -3,6 +3,7 @@ package fr.reviewbot.infrastructure.out.persistence;
 import fr.reviewbot.application.port.out.RepositoryStore;
 import fr.reviewbot.domain.model.ModalEnum;
 import fr.reviewbot.domain.model.Repository;
+import fr.reviewbot.domain.model.Unset;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
@@ -27,11 +28,9 @@ public class JdbcRepositoryStore implements RepositoryStore {
     }
 
     public Repository save(Repository repository) {
-
         var now = Sql.toTimestamp(clock.instant());
-
             try {
-                if(repository.id() == null) {
+                if(!Unset.isSaved(repository.id())) {
                     var id = jdbc.insert("INSERT INTO repository (platform, full_name, clone_url, api_token_encrypted," +
                                     "webhook_secret_encrypted, enabled, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?)",
                             ps -> {
