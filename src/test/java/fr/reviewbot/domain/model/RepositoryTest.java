@@ -10,12 +10,21 @@ public class RepositoryTest {
     void createBuildsAnEnabledRepositoryWithoutId() {
         Repository repository = Repository.create(ModalEnum.Platform.GITHUB, "acme/shop", "https://github.com/acme/shop.git", "tok", "sec");
 
-        assertNull(repository.id());
+        assertFalse(Unset.isSaved(repository.id()));
         assertEquals(ModalEnum.Platform.GITHUB, repository.platform());
         assertEquals("acme/shop", repository.fullName());
         assertTrue(repository.enabled());
-        assertNull(repository.created());
+        assertFalse(Unset.isSet(repository.created()));
     }
+
+    @Test
+    void nullTextsBecomeEmptyStrings() {
+        Repository repository = Repository.create(ModalEnum.Platform.GITLAB, "acme/shop", "https://x", null, null);
+
+        assertEquals("", repository.apiTokenEncrypted());
+        assertEquals("", repository.webhookSecretEncrypted());
+    }
+
 
     @Test
     void platformIsRequired() {
