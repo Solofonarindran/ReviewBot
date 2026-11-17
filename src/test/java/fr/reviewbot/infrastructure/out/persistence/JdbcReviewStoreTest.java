@@ -5,6 +5,7 @@ import fr.reviewbot.application.port.out.ReviewStore;
 import fr.reviewbot.domain.model.ModalEnum;
 import fr.reviewbot.domain.model.Repository;
 import fr.reviewbot.domain.model.Review;
+import fr.reviewbot.domain.model.Unset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +52,9 @@ class JdbcReviewStoreTest {
         assertEquals("Titre 214", saved.prTitle());
         assertEquals(ModalEnum.ReviewStatus.QUEUED, saved.status());
         assertEquals(ModalEnum.Verdict.PENDING, saved.verdict());
-        assertNull(saved.coverageChangedLines());
-        assertNotNull(saved.queuedAt());
-        assertNull(saved.startedAt());
+        assertFalse(Unset.isKnown(saved.coverageChangedLines()));
+        assertTrue(Unset.isSet(saved.queuedAt()));
+        assertFalse(Unset.isSet(saved.startedAt()));
     }
 
     @Test
