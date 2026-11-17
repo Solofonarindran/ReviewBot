@@ -3,6 +3,7 @@ package fr.reviewbot.infrastructure.out.persistence;
 import fr.reviewbot.application.port.out.RepositoryStore;
 import fr.reviewbot.domain.model.ModalEnum;
 import fr.reviewbot.domain.model.Repository;
+import fr.reviewbot.domain.model.Unset;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,13 +29,13 @@ class JdbcRepositoryStoreTest {
     void saveInsertsAndReadsBack() {
         Repository saved = store.save(newRepository("acme/shop"));
 
-        assertNotNull(saved.id());
+        assertNotEquals(Unset.ID,saved.id());
         assertEquals(ModalEnum.Platform.GITHUB, saved.platform());
         assertEquals("acme/shop", saved.fullName());
         assertEquals("tok", saved.apiTokenEncrypted());
         assertTrue(saved.enabled());
-        assertNotNull(saved.created());
-        assertNotNull(saved.updatedAt());
+        assertTrue(Unset.isSet(saved.created()));
+        assertTrue(Unset.isSet(saved.updatedAt()));
         assertEquals(saved, store.findById(saved.id()).orElseThrow());
     }
 
@@ -50,7 +51,7 @@ class JdbcRepositoryStoreTest {
         assertEquals(ModalEnum.Platform.GITLAB, updated.platform());
         assertEquals("acme/shop2", updated.fullName());
         assertFalse(updated.enabled());
-        assertEquals(null, updated.apiTokenEncrypted());
+        assertEquals("", updated.apiTokenEncrypted());
     }
 
     @Test
