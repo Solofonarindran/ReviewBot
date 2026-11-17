@@ -52,12 +52,33 @@ public record Review(
 ) {
 
 
+    public Review  {
+        if (prNumber == null || prNumber.isBlank()) {
+            throw new IllegalArgumentException("prNumber est obligatoire");
+        }
+        if (headCommitSha == null || headCommitSha.isBlank()) {
+            throw new IllegalArgumentException("headCommitSha est obligatoire");
+        }
+        Objects.requireNonNull(status, "status");
+        verdict = (verdict == null) ? ModalEnum.Verdict.PENDING : verdict;
+        prTitle = Unset.text(prTitle);
+        prAuthor = Unset.text(prAuthor);
+        sourceBranch = Unset.text(sourceBranch);
+        targetBranch = Unset.text(targetBranch);
+        errorMessage = Unset.text(errorMessage);
+        configSnapshot = Unset.text(configSnapshot);
+        globalCommentRef = Unset.text(globalCommentRef);
+        coverageChangedLines = Unset.percent(coverageChangedLines);
+        queuedAt = Unset.instant(queuedAt);
+        startedAt = Unset.instant(startedAt);
+        finishedAt = Unset.instant(finishedAt);
+    }
     /** Crée une revue neuve, en attente, sans résultat. */
 
     public static  Review queued(long repositoryId, String prNumber, String prTitle, String prAuthor,
                                  String sourceBranch, String targetBranch, String headCommitSha) {
-        return new Review(null, repositoryId, prNumber, prTitle, prAuthor, sourceBranch,
+        return new Review(Unset.ID, repositoryId, prNumber, prTitle, prAuthor, sourceBranch,
                          targetBranch,headCommitSha, ModalEnum.ReviewStatus.QUEUED, ModalEnum.Verdict.PENDING,0,0,0,
-                null, null,null,null,null  ,null,null);
+                Unset.PERCENT, Unset.TEXT,Unset.TEXT,Unset.TEXT,Unset.INSTANT,Unset.INSTANT,Unset.INSTANT);
     }
 }
