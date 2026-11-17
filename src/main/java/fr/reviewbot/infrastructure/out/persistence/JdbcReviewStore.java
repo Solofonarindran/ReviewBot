@@ -3,6 +3,8 @@ package fr.reviewbot.infrastructure.out.persistence;
 import fr.reviewbot.application.port.out.ReviewStore;
 import fr.reviewbot.domain.model.ModalEnum;
 import fr.reviewbot.domain.model.Review;
+import fr.reviewbot.domain.model.Unset;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +12,7 @@ import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public class JdbcReviewStore implements ReviewStore {
     private static final String COLUMNS = "id, repository_id, pr_number, pr_title, pr_author, source_branch, "
             + "target_branch, head_commit_sha, status, verdict, blocking_count, major_count, minor_count, "
@@ -25,8 +28,8 @@ public class JdbcReviewStore implements ReviewStore {
     }
     @Override
     public Review save(Review r) {
-        if (r.id() == null) {
-            var queuedAt = Sql.toTimestamp(r.queuedAt() != null ? r.queuedAt() : clock.instant());
+        if (!Unset.isSaved(r.id())) {
+            var queuedAt = Sql.toTimestamp(Unset.isSet(r.queuedAt()) ? r.queuedAt() : clock.instant());
             try {
                 long id = jdbc.insert(
                         "INSERT INTO review (repository_id, pr_number, pr_title, pr_author, source_branch, "
@@ -138,7 +141,7 @@ public class JdbcReviewStore implements ReviewStore {
             throw new RuntimeException(e);
         }
     }
-    
+
     private static Review map(ResultSet rs) throws SQLException {
         return new Review(
                 rs.getLong("id"),
