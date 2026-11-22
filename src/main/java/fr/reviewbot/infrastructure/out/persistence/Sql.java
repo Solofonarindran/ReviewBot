@@ -28,6 +28,20 @@ final class  Sql {
     static  Instant getInstant(ResultSet resultset, String column) throws SQLException {
         return toInstant(resultset.getTimestamp(column));
     }
+    /** Référence vers une autre ligne : "pas de référence" (id 0) devient NULL. */
+    static void setId(PreparedStatement ps, int index, long id) throws SQLException {
+        if (Unset.isSaved(id)) {
+            ps.setLong(index, id);
+        } else {
+            ps.setNull(index, Types.BIGINT);
+        }
+    }
+
+    /** Référence SQL vers domaine : NULL devient "pas de référence" (id 0). */
+    static long getId(ResultSet rs, String column) throws SQLException {
+        long value = rs.getLong(column);
+        return rs.wasNull() ? Unset.ID : value;
+    }
 
     /** Pourcentage du domaine vers SQL : "inconnu" devient NULL. */
     static BigDecimal toDecimal(BigDecimal percent) {
