@@ -3,8 +3,7 @@ package fr.reviewbot.infrastructure.out.persistence;
 import fr.reviewbot.domain.model.Unset;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Objects;
@@ -35,9 +34,24 @@ final class  Sql {
         return Unset.isKnown(percent) ? percent : null;
     }
 
+    /** Entier optionnel du domaine vers SQL : "inconnu" devient NULL. */
+    static void setNumber(PreparedStatement ps, int index, int value) throws SQLException {
+        if (Unset.isKnown(new BigDecimal(value))) {
+            ps.setInt(index, value);
+        } else {
+            ps.setNull(index, Types.INTEGER);
+        }
+    }
+
     /** Pourcentage SQL vers domaine : NULL devient "inconnu". */
     static BigDecimal getPercent(ResultSet rs, String column) throws SQLException {
         return Unset.percent(rs.getBigDecimal(column));
+    }
+
+    /** Entier optionnel SQL vers domaine : NULL devient "inconnu". */
+    static int getNumber(ResultSet rs, String column) throws SQLException {
+        int value = rs.getInt(column);
+        return rs.wasNull() ? Unset.NUMBER : value;
     }
 
     static <E extends  Enum<E>> E getEnum(ResultSet resultset, String column, Class<E> enumClass) throws SQLException {
@@ -49,6 +63,6 @@ final class  Sql {
         return value == null ? null : Enum.valueOf(enumClass, value);
     }
     static  String name(Enum<?> value) {
-        return value == null ? null : value.name();
+        return value.name();
     }
 }
