@@ -45,7 +45,7 @@ class JdbcJobQueueStoreTest {
     private JobQueueStore queue;
 
     @Test
-    void enqueueCreatesAQueuedJob() {
+    void enqueueCreatesAQueuedJob() throws Exception {
         Review review = savedReview("1");
 
         JobQueueEntry job = queue.enqueue(review.id());
@@ -60,7 +60,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void claimNextReturnsTheOldestJobFirst() {
+    void claimNextReturnsTheOldestJobFirst() throws Exception {
         JobQueueEntry first = queue.enqueue(savedReview("1").id());
         JobQueueEntry second = queue.enqueue(savedReview("2").id());
         JobQueueEntry third = queue.enqueue(savedReview("3").id());
@@ -72,7 +72,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void claimNextLocksTheJobForTheWorker() {
+    void claimNextLocksTheJobForTheWorker() throws Exception {
         queue.enqueue(savedReview("1").id());
 
         JobQueueEntry claimed = queue.claimNext("worker-7", LOCK).orElseThrow();
@@ -85,7 +85,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void aClaimedJobIsNeverGivenTwice() {
+    void aClaimedJobIsNeverGivenTwice() throws Exception {
         queue.enqueue(savedReview("1").id());
 
         assertTrue(queue.claimNext("w1", LOCK).isPresent());
@@ -93,12 +93,12 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void claimNextOnEmptyQueueIsEmpty() {
+    void claimNextOnEmptyQueueIsEmpty() throws Exception {
         assertEquals(Optional.empty(), queue.claimNext("w1", LOCK));
     }
 
     @Test
-    void onlyOneJobRunsAtATimeForTheSamePullRequest() {
+    void onlyOneJobRunsAtATimeForTheSamePullRequest() throws Exception {
         JobQueueEntry older = queue.enqueue(savedReview("1", "sha-a").id());
         JobQueueEntry newer = queue.enqueue(savedReview("1", "sha-b").id());
 
@@ -111,7 +111,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void otherPullRequestsAreNotBlocked() {
+    void otherPullRequestsAreNotBlocked() throws Exception {
         queue.enqueue(savedReview("1", "sha-a").id());
         queue.enqueue(savedReview("1", "sha-b").id());
         JobQueueEntry otherPr = queue.enqueue(savedReview("2").id());
@@ -122,7 +122,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void markDoneEndsTheJobAndReleasesTheLock() {
+    void markDoneEndsTheJobAndReleasesTheLock() throws Exception {
         queue.enqueue(savedReview("1").id());
         JobQueueEntry claimed = queue.claimNext("w1", LOCK).orElseThrow();
 
@@ -135,7 +135,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void markFailedPutsTheJobBackInTheQueueWhileAttemptsRemain() {
+    void markFailedPutsTheJobBackInTheQueueWhileAttemptsRemain() throws Exception {
         queue.enqueue(savedReview("1").id());
         JobQueueEntry claimed = queue.claimNext("w1", LOCK).orElseThrow();
 
@@ -149,7 +149,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void markFailedEndsTheJobOnceMaxAttemptsIsReached() {
+    void markFailedEndsTheJobOnceMaxAttemptsIsReached() throws Exception {
         queue.enqueue(savedReview("1").id());
         JobQueueEntry job = queue.claimNext("w1", LOCK).orElseThrow();
         job = queue.markFailed(job.id(), "e1", 2);
@@ -164,7 +164,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void aRetriedJobKeepsItsPlaceInTheQueue() {
+    void aRetriedJobKeepsItsPlaceInTheQueue() throws Exception {
         JobQueueEntry first = queue.enqueue(savedReview("1").id());
         queue.enqueue(savedReview("2").id());
         JobQueueEntry claimed = queue.claimNext("w1", LOCK).orElseThrow();
@@ -174,7 +174,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void releaseExpiredPutsBackJobsOfDeadWorkers() {
+    void releaseExpiredPutsBackJobsOfDeadWorkers() throws Exception {
         queue.enqueue(savedReview("1").id());
         JobQueueEntry crashed = queue.claimNext("dead-worker", ALREADY_EXPIRED).orElseThrow();
 
@@ -188,7 +188,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void releaseExpiredFailsJobsOutOfAttempts() {
+    void releaseExpiredFailsJobsOutOfAttempts() throws Exception {
         queue.enqueue(savedReview("1").id());
         JobQueueEntry crashed = queue.claimNext("dead-worker", ALREADY_EXPIRED).orElseThrow();
 
@@ -199,7 +199,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void releaseExpiredLeavesActiveLocksAlone() {
+    void releaseExpiredLeavesActiveLocksAlone() throws Exception {
         queue.enqueue(savedReview("1").id());
         JobQueueEntry running = queue.claimNext("w1", LOCK).orElseThrow();
 
@@ -208,7 +208,7 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void countByStateAndFindByReviewId() {
+    void countByStateAndFindByReviewId() throws Exception {
         Review review = savedReview("1");
         long queuedBefore = queue.countByState(ModalEnum.JobState.QUEUED);
         long runningBefore = queue.countByState(ModalEnum.JobState.RUNNING);
@@ -224,14 +224,14 @@ class JdbcJobQueueStoreTest {
     }
 
     @Test
-    void operationsOnUnknownJobFail() {
+    void operationsOnUnknownJobFail() throws Exception {
         assertThrows(RuntimeException.class, () -> queue.markDone(999_999L));
         assertThrows(RuntimeException.class, () -> queue.markFailed(999_999L, "x", 3));
         assertTrue(queue.findById(999_999L).isEmpty());
     }
 
     @Test
-    void jobsAreDeletedWithTheirReview() {
+    void jobsAreDeletedWithTheirReview() throws Exception {
         Review review = savedReview("1");
         JobQueueEntry job = queue.enqueue(review.id());
 
