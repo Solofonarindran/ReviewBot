@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SqlTest {
     @Test
@@ -40,7 +39,7 @@ public class SqlTest {
 
     @Test
     void nameOfNullEnumIsNull() {
-        assertNull(Sql.name(null));
+        assertThrows(NullPointerException.class, () -> Sql.name(null));
         assertEquals("BLOCKING", Sql.name(ModalEnum.Verdict.BLOCKING));
     }
 
