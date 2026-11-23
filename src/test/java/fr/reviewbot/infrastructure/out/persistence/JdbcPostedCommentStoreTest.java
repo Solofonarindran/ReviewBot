@@ -43,13 +43,13 @@ class JdbcPostedCommentStoreTest {
     @Autowired
     private JdbcExecutor executor;
 
-    private Finding savedFinding(Review review) {
+    private Finding savedFinding(Review review) throws Exception {
         return findings.save(new Finding(Unset.ID, review.id(), Unset.ID, Unset.ID, "PMD", "R", ModalEnum.Category.BUG,
                 ModalEnum.Severity.MAJOR, "A.java", 12, 12, "t", "", "", true, "fp", null));
     }
 
     @Test
-    void saveInsertsTheGlobalComment() {
+    void saveInsertsTheGlobalComment() throws Exception {
         Review review = savedReview("1");
 
         PostedComment saved = comments.save(PostedComment.global(review.id(), "gh-1"));
@@ -65,7 +65,7 @@ class JdbcPostedCommentStoreTest {
     }
 
     @Test
-    void saveInsertsAnInlineComment() {
+    void saveInsertsAnInlineComment() throws Exception {
         Review review = savedReview("1");
         Finding finding = savedFinding(review);
 
@@ -78,7 +78,7 @@ class JdbcPostedCommentStoreTest {
     }
 
     @Test
-    void saveUpdatesStateAndPlatformId() {
+    void saveUpdatesStateAndPlatformId() throws Exception {
         Review review = savedReview("1");
         PostedComment saved = comments.save(PostedComment.global(review.id(), ""));
 
@@ -102,7 +102,7 @@ class JdbcPostedCommentStoreTest {
     }
 
     @Test
-    void findByReviewIdAndKind() {
+    void findByReviewIdAndKind() throws Exception {
         Review review = savedReview("1");
         Finding finding = savedFinding(review);
         PostedComment global = comments.save(PostedComment.global(review.id(), "g"));
@@ -118,12 +118,12 @@ class JdbcPostedCommentStoreTest {
     }
 
     @Test
-    void findByIdOfUnknownCommentIsEmpty() {
+    void findByIdOfUnknownCommentIsEmpty() throws Exception {
         assertTrue(comments.findById(999_999L).isEmpty());
     }
 
     @Test
-    void deletingTheFindingKeepsTheCommentWithoutReference() {
+    void deletingTheFindingKeepsTheCommentWithoutReference() throws Exception {
         Review review = savedReview("1");
         Finding finding = savedFinding(review);
         PostedComment inline = comments.save(PostedComment.inline(review.id(), finding.id(), "i", "A.java", 12));
@@ -135,7 +135,7 @@ class JdbcPostedCommentStoreTest {
     }
 
     @Test
-    void commentsAreDeletedWithTheirReview() {
+    void commentsAreDeletedWithTheirReview() throws Exception {
         Review review = savedReview("1");
         PostedComment saved = comments.save(PostedComment.global(review.id(), "g"));
 
