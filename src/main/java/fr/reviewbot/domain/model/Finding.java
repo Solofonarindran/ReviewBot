@@ -27,7 +27,7 @@ import java.util.Objects;
  * @param createdAt     date de création ({@link Unset#INSTANT} avant l'enregistrement)
  */
 
-@Component
+
 public record Finding(
         long id,
         long reviewId,
