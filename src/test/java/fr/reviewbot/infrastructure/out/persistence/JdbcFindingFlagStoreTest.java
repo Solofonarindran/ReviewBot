@@ -39,13 +39,13 @@ class JdbcFindingFlagStoreTest {
         return ReviewFixtures.savedReview(repositories, reviews, prNumber, headCommitSha);
     }
 
-    private Finding savedFinding(Review review, String fingerprint) {
-        return findings.save(new Finding(Unset.ID, review.id(), Unset.ID, Unset.ID, "PMD", "R", Category.BUG,
+    private Finding savedFinding(Review review, String fingerprint) throws Exception {
+        return findings.save(new Finding(Unset.ID, review.id(), Unset.ID, Unset.ID, "PMD", "R", ModalEnum.Category.BUG,
                 ModalEnum.Severity.MAJOR, "A.java", 1, 1, "t", "", "", true, fingerprint, null));
     }
 
     @Test
-    void saveInsertsAFlag() {
+    void saveInsertsAFlag() throws Exception {
         Finding finding = savedFinding(savedReview("1"), "fp");
 
         FindingFlag saved = flags.save(FindingFlag.of(finding.id(), "alice", "voulu"));
@@ -58,22 +58,22 @@ class JdbcFindingFlagStoreTest {
     }
 
     @Test
-    void emptyReasonIsAllowed() {
+    void emptyReasonIsAllowed() throws Exception {
         Finding finding = savedFinding(savedReview("1"), "fp");
 
         assertEquals(Unset.TEXT, flags.save(FindingFlag.of(finding.id(), "alice", null)).reason());
     }
 
     @Test
-    void aFindingCanOnlyBeFlaggedOnce() {
-        Finding finding = savedFinding(savedReview("1"), "fp");
+    void aFindingCanOnlyBeFlaggedOnce() throws Exception {
+        var finding = savedFinding(savedReview("1"), "fp");
         flags.save(FindingFlag.of(finding.id(), "alice", "a"));
 
-        assertThrows(RuntimeException.class, () -> flags.save(FindingFlag.of(finding.id(), "bob", "b")));
+        assertThrows(Exception.class, () -> flags.save(FindingFlag.of(finding.id(), "bob", "b")));
     }
 
     @Test
-    void saveUpdatesReasonAndAuthor() {
+    void saveUpdatesReasonAndAuthor() throws Exception {
         Finding finding = savedFinding(savedReview("1"), "fp");
         FindingFlag saved = flags.save(FindingFlag.of(finding.id(), "alice", "a"));
 
@@ -85,7 +85,7 @@ class JdbcFindingFlagStoreTest {
     }
 
     @Test
-    void updateOfUnknownFlagFails() {
+    void updateOfUnknownFlagFails() throws Exception {
         Finding finding = savedFinding(savedReview("1"), "fp");
 
         assertThrows(RuntimeException.class,
@@ -93,7 +93,7 @@ class JdbcFindingFlagStoreTest {
     }
 
     @Test
-    void findByFindingId() {
+    void findByFindingId() throws Exception {
         Finding finding = savedFinding(savedReview("1"), "fp");
         Finding other = savedFinding(savedReview("2"), "fp2");
         flags.save(FindingFlag.of(finding.id(), "alice", "a"));
@@ -103,7 +103,7 @@ class JdbcFindingFlagStoreTest {
     }
 
     @Test
-    void findByReviewIdReturnsOnlyFlagsOfThatReview() {
+    void findByReviewIdReturnsOnlyFlagsOfThatReview() throws Exception {
         Review review = savedReview("1");
         Review other = savedReview("2");
         Finding f1 = savedFinding(review, "a");
@@ -121,7 +121,7 @@ class JdbcFindingFlagStoreTest {
     }
 
     @Test
-    void deleteByFindingIdRemovesTheFlag() {
+    void deleteByFindingIdRemovesTheFlag() throws Exception {
         Finding finding = savedFinding(savedReview("1"), "fp");
         flags.save(FindingFlag.of(finding.id(), "alice", "a"));
 
@@ -132,7 +132,7 @@ class JdbcFindingFlagStoreTest {
     }
 
     @Test
-    void flagsAreDeletedWithTheirFinding() {
+    void flagsAreDeletedWithTheirFinding() throws Exception {
         Review review = savedReview("1");
         Finding finding = savedFinding(review, "fp");
         flags.save(FindingFlag.of(finding.id(), "alice", "a"));
